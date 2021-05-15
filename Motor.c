@@ -20,7 +20,7 @@ main (int argc, char **argv)
 	MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
-	printf("Hola Mundoo :: Soy el Nodo con ID = %d de un total de %d nodos.\n", ID, nproc);
+	printf("Hola Mundo :: Soy el Nodo con ID = %d de un total de %d nodos.\n", ID, nproc);
 
 //    MPI_Send(void* buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 //    MPI_Recv(void* buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
