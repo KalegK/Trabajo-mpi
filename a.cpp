@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 		cout <<   length<< endl;
 
 		for  (int i = 0; i < length; ++i){
-			MPI_Recv(buffer_documentos[i] , 3, MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
+			MPI_Recv(buffer_documentos , 3, MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
 			printf(" cantidad de terminos = %d %d %d::::\n\n", buffer_documentos[0], buffer_documentos[1], buffer_documentos[2],var_status.MPI_SOURCE, var_status.MPI_TAG);
 		}
 			
