@@ -38,9 +38,11 @@ int main(int argc, char **argv)
 			
 		
 			scanf("%d", &cant_terminos);
+			cout<<cant_terminos<< endl;
 			cout << "cant_terminos = " << cant_terminos << endl;
-			getchar();
+			
 			MPI_Send( &cant_terminos , 3, MPI_INT, 1,  0 , MPI_COMM_WORLD);
+			getchar();
 
 			for (int j = 0; j < cant_terminos; ++j)
 			{
@@ -63,13 +65,16 @@ int main(int argc, char **argv)
 	if (ID == 1){
 
 		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
-		printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
+		// printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
 		int arreglo_documentos[buffer_nodo[0]];
 		int length = sizeof(arreglo_documentos)/sizeof(int);
 		cout <<   length<< endl;
 
-		MPI_Recv(buffer_documentos , 3 , MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
-		printf(" cantidad de terminos = %d %d %d ::::\n\n", buffer_documentos[0], buffer_documentos[1], buffer_documentos[2],var_status.MPI_SOURCE, var_status.MPI_TAG);
+		for  (int i = 0; i < length; ++i){
+			MPI_Recv(buffer_documentos[i] , 3, MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
+			printf(" cantidad de terminos = %d %d %d::::\n\n", buffer_documentos[0], buffer_documentos[1], buffer_documentos[2],var_status.MPI_SOURCE, var_status.MPI_TAG);
+		}
+			
 
 		
 	}
