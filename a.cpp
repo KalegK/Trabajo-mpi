@@ -5,14 +5,20 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
+
+#define TAG_LENGTH 1
+#define TAG_DATA 2
+
 
 using namespace std;
+map <string, vector<string> > mapa;
 
 int main(int argc, char **argv)
 {
 	int num_documentos, cant_terminos, cant_consultas, ID, nproc;
 	int buffer_nodo[100];
-	int buffer_documentos[100];
+	int buffer_cantidad[100];
 	char titulo[1000];
 	char termino[1000];
 	char consulta[1000];
@@ -27,27 +33,32 @@ int main(int argc, char **argv)
 	if (ID == 0)
 	{
 		scanf("%d", &num_documentos);
-		cout << "num_documentos = " << num_documentos << endl;
-		MPI_Send( &num_documentos , 1, MPI_INT, 1,  0 , MPI_COMM_WORLD);
+		// cout << "num_documentos = " << num_documentos << endl;
+		MPI_Send(&num_documentos , 1, MPI_INT, 1,  0 , MPI_COMM_WORLD);
 
 		for (int i = 0; i < num_documentos; ++i)
 		{
 			getchar();
 			scanf("%s", titulo);
-			cout << "titulo = " << titulo << endl;
+			// cout << "titulo = " << titulo << endl;
+			MPI_Send(titulo, 100, MPI_CHAR, 1, TAG_LENGTH,MPI_COMM_WORLD);
 			
 		
 			scanf("%d", &cant_terminos);
-			cout<<cant_terminos<< endl;
-			cout << "cant_terminos = " << cant_terminos << endl;
+			// cout<<cant_terminos<< endl;
+			// cout << "cant_terminos = " << cant_terminos << endl;
+			MPI_Send( &cant_terminos , 1, MPI_INT, 1,  2, MPI_COMM_WORLD); // tag 2  envia la canitdad de terminos
+
+	
 			
-			MPI_Send( &cant_terminos , 3, MPI_INT, 1,  0 , MPI_COMM_WORLD);
+			
 			getchar();
 
 			for (int j = 0; j < cant_terminos; ++j)
 			{
 				scanf("%s", termino);
-				cout << "termino = " << termino << endl;
+				// cout << "termino = " << termino << endl;
+				MPI_Send(termino, 100, MPI_CHAR, 1, TAG_LENGTH,MPI_COMM_WORLD);
 			}
 		}
 
@@ -57,25 +68,48 @@ int main(int argc, char **argv)
 		for (int i = 0; i < cant_consultas; ++i)
 		{
 			scanf("%s", consulta);
-			cout << "consulta = " << consulta << endl;
+			// cout << "consulta = " << consulta << endl;
 		}
 
 	}
 	
 	if (ID == 1){
 
-		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
-		// printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
-		int arreglo_documentos[buffer_nodo[0]];
-		int length = sizeof(arreglo_documentos)/sizeof(int);
-		cout <<   length<< endl;
+		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , 0, MPI_COMM_WORLD, &var_status);
+		printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
+	
 
-		for  (int i = 0; i < length; ++i){
-			MPI_Recv(buffer_documentos , 3, MPI_INT ,MPI_ANY_SOURCE , MPI_ANY_TAG, MPI_COMM_WORLD, &var_status);
-			printf(" cantidad de terminos = %d %d %d::::\n\n", buffer_documentos[0], buffer_documentos[1], buffer_documentos[2],var_status.MPI_SOURCE, var_status.MPI_TAG);
+
+		
+		for  (int i = 0; i < buffer_nodo[0]; ++i){
+			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status);
+			printf(" Dato recibido = %d :: :\n\n", buffer_cantidad[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
 		}
-			
+		// MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,0, MPI_COMM_WORLD, &var_status);
+		// printf(" Dato recibido = %d :: :\n\n", buffer_cantidad[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
 
+		
+		for (int i=0; i<buffer_nodo[0]; i++){
+
+			MPI_Recv(titulo, 100, MPI_CHAR, 0, TAG_LENGTH, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				for(int i = 0;i< buffer_cantidad[0]; i++){
+					MPI_Recv(termino, 100, MPI_CHAR, 0, TAG_LENGTH, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					mapa[titulo].push_back(termino);
+				}
+			
+					
+				
+		}
+		
+		for (auto &el1: mapa)
+		{
+			cout << el1.first << endl;
+			for (auto &el2: el1.second)
+			{
+				cout << el2 << " ";
+			}
+			cout << endl;
+		}
 		
 	}
 	
