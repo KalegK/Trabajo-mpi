@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-#define TAG_LENGTH 1
+
 #define TAG_DATA 2
 
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 			getchar();
 			scanf("%s", titulo);
 			// cout << "titulo = " << titulo << endl;
-			MPI_Send(titulo, 100, MPI_CHAR, 1, TAG_LENGTH,MPI_COMM_WORLD);
+			MPI_Send(titulo, 100, MPI_CHAR, 1, 1,MPI_COMM_WORLD);
 			
 		
 			scanf("%d", &cant_terminos);
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 			{
 				scanf("%s", termino);
 				// cout << "termino = " << termino << endl;
-				MPI_Send(termino, 100, MPI_CHAR, 1, TAG_LENGTH,MPI_COMM_WORLD);
+				MPI_Send(termino, 100, MPI_CHAR, 1, 3,MPI_COMM_WORLD);
 			}
 		}
 
@@ -81,19 +81,14 @@ int main(int argc, char **argv)
 
 
 		
-		for  (int i = 0; i < buffer_nodo[0]; ++i){
-			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status);
-			printf(" Dato recibido = %d :: :\n\n", buffer_cantidad[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
-		}
-		// MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,0, MPI_COMM_WORLD, &var_status);
-		// printf(" Dato recibido = %d :: :\n\n", buffer_cantidad[0], var_status.MPI_SOURCE, var_status.MPI_TAG);
-
+	
 		
 		for (int i=0; i<buffer_nodo[0]; i++){
-
-			MPI_Recv(titulo, 100, MPI_CHAR, 0, TAG_LENGTH, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status);
+			MPI_Recv(titulo, 100, MPI_CHAR, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				for(int i = 0;i< buffer_cantidad[0]; i++){
-					MPI_Recv(termino, 100, MPI_CHAR, 0, TAG_LENGTH, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					
+					MPI_Recv(termino, 100, MPI_CHAR, 0, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 					mapa[titulo].push_back(termino);
 				}
 			
