@@ -33,6 +33,7 @@ int main(int argc, char **argv)
 	char titulo[1000];
 	char termino[1000];
 	char consulta[1000];
+	int contador=0;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &nproc);
@@ -97,7 +98,6 @@ int main(int argc, char **argv)
 	
 	if (ID == 1){
 		
-		MPI_Request request;
 
 		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , 0, MPI_COMM_WORLD, &var_status); // recibe cantidad de documentos
 		// printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG); 
@@ -139,26 +139,60 @@ int main(int argc, char **argv)
 		}
 		
 		
-		for (iter = mapa.begin(); iter != mapa.end(); iter++)
-		{
-			for (int i = 0; i < consultas.size(); ++i)
-			{
-				if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
-				{
-					mapa2[consultas[i]].push_back(iter->first);
-		
-				}
+		// for (iter = mapa.begin(); iter != mapa.end(); iter++)
+		// {
+		// 	for (int i = 0; i < consultas.size(); ++i)
+		// 	{	
+				
 			
-				else{
-					mapa2[consultas[i]].push_back("No existe resultado");
+		// 		if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
+		// 		{
+		// 			mapa2[consultas[i]].push_back(iter->first);
+		// 			contador=0;
+		// 		}
+		// 		else{		
+		// 			cout<< "contador I" <<contador << endl;	 
+		// 			contador=contador+1;
+		// 			cout<< "contador F" <<contador << endl;
+		// 			if(contador==buffer_nodo[0]){
+		// 				mapa2[consultas[i]].push_back("No existe resultado");
+		// 				contador=0;
+						
+		// 			}else{
+		// 				contador=0;
+		// 			}
+		// 		}
+		// 	}
+		// }
 
+		for (int i = 0; i < consultas.size(); ++i){
+			for (iter = mapa.begin(); iter != mapa.end(); iter++){
+
+				if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
+				{		
+					mapa2[consultas[i]].push_back(iter->first);
+					contador=0;
+					
 				}
+				else{		
+					cout<< "contador I" <<contador << endl;	 
+					contador=contador+1;
+					cout<< "contador F" <<contador << endl;
+					if(contador==buffer_nodo[0]){
+						mapa2[consultas[i]].push_back("No existe resultado");
+						contador=0;
+						
+					}
 			}
+
+
 		}
+		}
+
 
 		for (auto &el1: mapa2)
 		{
-			cout << "resultado para: " << el1.first ;
+			cout << "resultado para: " << el1.first << " -->";
 			for (auto &el2: el1.second)
 			{
 				cout << " " <<el2 << " ";
@@ -168,7 +202,6 @@ int main(int argc, char **argv)
 
 		
 	
-		MPI_Wait(&request, MPI_STATUS_IGNORE);
 	}
 	
 
