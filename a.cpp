@@ -175,13 +175,10 @@ int main(int argc, char **argv)
 					
 				}
 				else{		
-					cout<< "contador I" <<contador << endl;	 
 					contador=contador+1;
-					cout<< "contador F" <<contador << endl;
 					if(contador==buffer_nodo[0]){
 						mapa2[consultas[i]].push_back("No existe resultado");
 						contador=0;
-						
 					}
 			}
 
