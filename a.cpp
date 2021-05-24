@@ -8,16 +8,28 @@
 #include <vector>
 
 
-
-
 using namespace std;
-map <string, vector<string> > mapa;
+
+bool buscar(vector<string> a, char* b){
+
+		for (int i = 0; i < a.size(); ++i)
+		{
+			if (a[i] == b)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 int main(int argc, char **argv)
 {
 	int num_documentos, cant_terminos, cant_consultas, ID, nproc;
 	int buffer_nodo[100];
 	int buffer_cantidad[100];
+	int buffer_cantidad_consultas[100];
 	char titulo[1000];
 	char termino[1000];
 	char consulta[1000];
@@ -27,6 +39,13 @@ int main(int argc, char **argv)
 	MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 	MPI_Status var_status;
 
+	map <string, vector<string> > mapa;
+	map <string, vector<string> > mapa2;
+	map <string, vector<string>>::iterator iter;
+	vector<string> consultas;
+
+	bool buscar(vector<string> a, char* b);
+	
 
 
 	if (ID == 0)
@@ -62,12 +81,14 @@ int main(int argc, char **argv)
 		}
 
 		scanf("%d", &cant_consultas);
+		MPI_Send( &cant_consultas , 1, MPI_INT, 1,  4, MPI_COMM_WORLD);
 		getchar();
 
 		for (int i = 0; i < cant_consultas; ++i)
 		{
 			scanf("%s", consulta);
 			// cout << "consulta = " << consulta << endl;
+			MPI_Send(consulta, 100, MPI_CHAR, 1, 5,MPI_COMM_WORLD);//envia las consultas
 		}
 
 	}
@@ -106,6 +127,41 @@ int main(int argc, char **argv)
 			}
 			cout << endl;
 		}
+
+		MPI_Recv(buffer_cantidad_consultas, 1 , MPI_INT ,MPI_ANY_SOURCE ,4, MPI_COMM_WORLD, &var_status);// recibe la cantidad de las consultas
+		for(int i = 0;i< buffer_cantidad_consultas[0]; i++){
+			MPI_Recv(consulta, 100 , MPI_CHAR ,0 ,5, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe las consultas
+			consultas.insert(consultas.begin()+i,consulta); //crea un vector con las consultas
+		}
+		
+		
+		for (iter = mapa.begin(); iter != mapa.end(); iter++)
+		{
+			for (int i = 0; i < consultas.size(); ++i)
+			{
+				if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
+				{
+					mapa2[consultas[i]].push_back(iter->first);
+					
+				}else{
+					mapa2[consultas[i]].push_back("No existe resultado");
+					
+				}
+			}
+		}
+
+		for (auto &el1: mapa2)
+		{
+			cout << "resultado para: " << el1.first ;
+			for (auto &el2: el1.second)
+			{
+				cout << " " <<el2 << " ";
+			}
+			cout << endl;
+		}
+
+		
+	
 		
 	}
 	
