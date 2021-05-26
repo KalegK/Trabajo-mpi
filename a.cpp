@@ -10,6 +10,7 @@
 
 using namespace std;
 
+//funcion que realiza la busqueda entre un vector y una palabra
 bool buscar(vector<string> a, char* b){
 
 		for (int i = 0; i < a.size(); ++i)
@@ -54,20 +55,16 @@ int main(int argc, char **argv)
 		
 		
 		scanf("%d", &num_documentos);
-		// cout << "num_documentos = " << num_documentos << endl;
 		MPI_Send(&num_documentos , 1, MPI_INT, 1,  0 , MPI_COMM_WORLD); // tag 0 envia la canitdad de documentos a nodo 1
 
 		for (int i = 0; i < num_documentos; ++i)
 		{
 			getchar();
 			scanf("%s", titulo);
-			cout << "titulo = " << titulo << endl;
 			MPI_Send(titulo, 100, MPI_CHAR, 1, 1,MPI_COMM_WORLD); // tag 1  envia los titulos  a nodo 1
 			
 		
 			scanf("%d", &cant_terminos);
-			// cout<<cant_terminos<< endl;
-			cout << "cant_terminos = " << cant_terminos << endl;
 			MPI_Send( &cant_terminos , 1, MPI_INT, 1,  2, MPI_COMM_WORLD); // tag 2  envia la cantidad  de terminos
 
 	
@@ -78,20 +75,19 @@ int main(int argc, char **argv)
 			for (int j = 0; j < cant_terminos; ++j)
 			{
 				scanf("%s", termino);
-				cout << "termino = " << termino << endl;
 				MPI_Send(termino, 100, MPI_CHAR, 1, 3,MPI_COMM_WORLD);  // tag 3 envia   los terminos a cada documento
 			}
 		}
 
 		scanf("%d", &cant_consultas);
-		MPI_Send( &cant_consultas , 1, MPI_INT, 1,  4, MPI_COMM_WORLD);
+		MPI_Send( &cant_consultas , 1, MPI_INT, 1,  4, MPI_COMM_WORLD); // tag 4 envia la cantidad de consultas
 		getchar();
 
 		for (int i = 0; i < cant_consultas; ++i)
 		{
 			scanf("%s", consulta);
 			cout << "consulta = " << consulta << endl;
-			MPI_Send(consulta, 100, MPI_CHAR, 1, 5,MPI_COMM_WORLD);//envia las consultas
+			MPI_Send(consulta, 100, MPI_CHAR, 1, 5,MPI_COMM_WORLD);//tag 5 envia las consultas
 		}
 
 	}
@@ -100,13 +96,10 @@ int main(int argc, char **argv)
 		
 
 		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , 0, MPI_COMM_WORLD, &var_status); // recibe cantidad de documentos
-		// printf("\n\nNODO[%d] :: Dato recibido = %d :: ID Emisor = %d ::\n\n", ID, buffer_nodo[0], var_status.MPI_SOURCE, var_status.MPI_TAG); 
-	
 
-
-		
+			
 	
-		
+		//Recibe los terminos y los guarda dentro del documento correspondiente
 		for (int i=0; i<buffer_nodo[0]; i++){
 			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status); // recibe cantidad de terminos
 			MPI_Recv(titulo, 100, MPI_CHAR, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe titulos
@@ -139,32 +132,8 @@ int main(int argc, char **argv)
 		}
 		
 		
-		// for (iter = mapa.begin(); iter != mapa.end(); iter++)
-		// {
-		// 	for (int i = 0; i < consultas.size(); ++i)
-		// 	{	
-				
-			
-		// 		if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
-		// 		{
-		// 			mapa2[consultas[i]].push_back(iter->first);
-		// 			contador=0;
-		// 		}
-		// 		else{		
-		// 			cout<< "contador I" <<contador << endl;	 
-		// 			contador=contador+1;
-		// 			cout<< "contador F" <<contador << endl;
-		// 			if(contador==buffer_nodo[0]){
-		// 				mapa2[consultas[i]].push_back("No existe resultado");
-		// 				contador=0;
-						
-		// 			}else{
-		// 				contador=0;
-		// 			}
-		// 		}
-		// 	}
-		// }
-
+	
+		// realiza la busqueda de cada palabra en los documentos
 		for (int i = 0; i < consultas.size(); ++i){
 			for (iter = mapa.begin(); iter != mapa.end(); iter++){
 
@@ -186,7 +155,7 @@ int main(int argc, char **argv)
 		}
 		}
 
-
+		// Impresion de la busqueda realizada
 		for (auto &el1: mapa2)
 		{
 			cout << "resultado para: " << el1.first << " -->";
