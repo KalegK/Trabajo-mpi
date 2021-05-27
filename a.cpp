@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
 			
 	
-		//Recibe los terminos y los guarda dentro del documento correspondiente
+		//Recibe los terminos y crea el indice invertido 
 		for (int i=0; i<buffer_nodo[0]; i++){
 			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status); // recibe cantidad de terminos
 			MPI_Recv(titulo, 100, MPI_CHAR, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe titulos
@@ -114,7 +114,8 @@ int main(int argc, char **argv)
 		}
 		
 
-		// Impresion de los documentos
+		// // Impresion de el indice invertido
+		cout<<"\n****Indice invertido:****"<<endl;
 		for (auto &el1: mapa)
 		{
 			cout << el1.first << endl;
@@ -125,50 +126,46 @@ int main(int argc, char **argv)
 			cout << endl;
 		}
 
-	// 	MPI_Recv(buffer_cantidad_consultas, 1 , MPI_INT ,MPI_ANY_SOURCE ,4, MPI_COMM_WORLD, &var_status);// recibe la cantidad de las consultas
-	// 	for(int i = 0;i< buffer_cantidad_consultas[0]; i++){
-	// 		MPI_Recv(consulta, 100 , MPI_CHAR ,0 ,5, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe las consultas
-	// 		consultas.insert(consultas.begin()+i,consulta); //crea un vector con las consultas
-	// 	}
-		
+
+
+	MPI_Recv(buffer_cantidad_consultas, 1 , MPI_INT ,MPI_ANY_SOURCE ,4, MPI_COMM_WORLD, &var_status);// recibe la cantidad de las consultas
+	for(int i = 0;i< buffer_cantidad_consultas[0]; i++){
+	MPI_Recv(consulta, 100 , MPI_CHAR ,0 ,5, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe las consultas
+ 		consultas.insert(consultas.begin()+i,consulta); //crea un vector con las consultas
+		}
 		
 	
-	// 	// realiza la busqueda de cada palabra en los documentos
-	// 	for (int i = 0; i < consultas.size(); ++i){
-	// 		for (iter = mapa.begin(); iter != mapa.end(); iter++){
 
-	// 			if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
-	// 			{		
-	// 				mapa2[consultas[i]].push_back(iter->first);
-	// 				contador=0;
+	cout<<"\n****Resultado consultas:****";
+
+	//realiza la busqueda de la consulta en el indice invertido
+	for(int i = 0;i< consultas.size(); i++){
+		contador=0;
+		for (iter = mapa.begin(); iter != mapa.end(); iter++){
+
+            if(consultas[i]==iter->first){
+				cout<<" "<<endl;	
+				cout<<iter->first<<endl;
+				for(int j=0; j<iter->second.size();j++){	
+					cout<<" "<< iter->second[j]<<" ";	
 					
-	// 			}
-	// 			else{		
-	// 				contador=contador+1;
-	// 				if(contador==buffer_nodo[0]){
-	// 					mapa2[consultas[i]].push_back("No existe resultado");
-	// 					contador=0;
-	// 				}
-	// 		}
-
-
-	// 	}
-	// 	}
-
-	// 	// Impresion de la busqueda realizada
-	// 	for (auto &el1: mapa2)
-	// 	{
-	// 		cout << "resultado para: " << el1.first << " -->";
-	// 		for (auto &el2: el1.second)
-	// 		{
-	// 			cout << " " <<el2 << " ";
-	// 		}
-	// 		cout << endl;
-	// 	}
-
+				}	
+		}
+		    else{
+				contador=contador+1;
+				if(contador==mapa.size()){
+						cout<<" "<<endl;	
+						cout<<"Para "<<consultas[i]<<" no existe resultado"<<endl;
+					}
+			  
+			  
+		}
 		
+		}
+		
+	}
 	
-	 }
+	}
 	
 
 	MPI_Finalize();
