@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 				for(int i = 0;i< buffer_cantidad[0]; i++){
 					
 					MPI_Recv(termino, 100, MPI_CHAR, 0, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);// recibe cada termino
-					mapa[titulo].push_back(termino);
+					mapa[termino].push_back(titulo);
 				}
 			
 					
@@ -125,50 +125,50 @@ int main(int argc, char **argv)
 			cout << endl;
 		}
 
-		MPI_Recv(buffer_cantidad_consultas, 1 , MPI_INT ,MPI_ANY_SOURCE ,4, MPI_COMM_WORLD, &var_status);// recibe la cantidad de las consultas
-		for(int i = 0;i< buffer_cantidad_consultas[0]; i++){
-			MPI_Recv(consulta, 100 , MPI_CHAR ,0 ,5, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe las consultas
-			consultas.insert(consultas.begin()+i,consulta); //crea un vector con las consultas
-		}
+	// 	MPI_Recv(buffer_cantidad_consultas, 1 , MPI_INT ,MPI_ANY_SOURCE ,4, MPI_COMM_WORLD, &var_status);// recibe la cantidad de las consultas
+	// 	for(int i = 0;i< buffer_cantidad_consultas[0]; i++){
+	// 		MPI_Recv(consulta, 100 , MPI_CHAR ,0 ,5, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe las consultas
+	// 		consultas.insert(consultas.begin()+i,consulta); //crea un vector con las consultas
+	// 	}
 		
 		
 	
-		// realiza la busqueda de cada palabra en los documentos
-		for (int i = 0; i < consultas.size(); ++i){
-			for (iter = mapa.begin(); iter != mapa.end(); iter++){
+	// 	// realiza la busqueda de cada palabra en los documentos
+	// 	for (int i = 0; i < consultas.size(); ++i){
+	// 		for (iter = mapa.begin(); iter != mapa.end(); iter++){
 
-				if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
-				{		
-					mapa2[consultas[i]].push_back(iter->first);
-					contador=0;
+	// 			if (buscar(iter->second, const_cast<char*>(consultas[i].c_str())) == true)
+	// 			{		
+	// 				mapa2[consultas[i]].push_back(iter->first);
+	// 				contador=0;
 					
-				}
-				else{		
-					contador=contador+1;
-					if(contador==buffer_nodo[0]){
-						mapa2[consultas[i]].push_back("No existe resultado");
-						contador=0;
-					}
-			}
+	// 			}
+	// 			else{		
+	// 				contador=contador+1;
+	// 				if(contador==buffer_nodo[0]){
+	// 					mapa2[consultas[i]].push_back("No existe resultado");
+	// 					contador=0;
+	// 				}
+	// 		}
 
 
-		}
-		}
+	// 	}
+	// 	}
 
-		// Impresion de la busqueda realizada
-		for (auto &el1: mapa2)
-		{
-			cout << "resultado para: " << el1.first << " -->";
-			for (auto &el2: el1.second)
-			{
-				cout << " " <<el2 << " ";
-			}
-			cout << endl;
-		}
+	// 	// Impresion de la busqueda realizada
+	// 	for (auto &el1: mapa2)
+	// 	{
+	// 		cout << "resultado para: " << el1.first << " -->";
+	// 		for (auto &el2: el1.second)
+	// 		{
+	// 			cout << " " <<el2 << " ";
+	// 		}
+	// 		cout << endl;
+	// 	}
 
 		
 	
-	}
+	 }
 	
 
 	MPI_Finalize();
