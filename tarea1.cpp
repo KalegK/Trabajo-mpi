@@ -29,17 +29,14 @@ int main(int argc, char **argv)
 	MPI_Status var_status;
 
 	map <string, vector<string> > mapa;
-	map <string, vector<string> > mapa2;
 	map <string, vector<string>>::iterator iter;
 	vector<string> consultas;
 
-	bool buscar(vector<string> a, char* b);
-	
 
 
 	if (ID == 0)
 	{	
-		
+		//se realiza el envio de los datos leidos del archivo a otro nodo para la creacion del indice
 		scanf("%d", &num_documentos);
 		MPI_Send(&num_documentos , 1, MPI_INT, 1,  0 , MPI_COMM_WORLD); // tag 0 envia la canitdad de documentos a nodo 1
 
@@ -69,7 +66,7 @@ int main(int argc, char **argv)
 		for (int i = 0; i < cant_consultas; ++i)
 		{
 			scanf("%s", consulta);
-			cout << "consulta = " << consulta << endl;
+			//cout << "consulta = " << consulta << endl;
 			MPI_Send(consulta, 100, MPI_CHAR, 1, 5,MPI_COMM_WORLD);//tag 5 envia las consultas
 		}
 
@@ -79,7 +76,7 @@ int main(int argc, char **argv)
 		
 		MPI_Recv(buffer_nodo , 1 , MPI_INT ,MPI_ANY_SOURCE , 0, MPI_COMM_WORLD, &var_status); // recibe cantidad de documentos
 	
-		//Recibe los terminos y crea el indice invertido 
+		//Recibe los terminos y crea el indice invertido usando un map con un string y un vector de string
 		for (int i=0; i<buffer_nodo[0]; i++){
 			MPI_Recv(buffer_cantidad, 1 , MPI_INT ,MPI_ANY_SOURCE ,2, MPI_COMM_WORLD, &var_status); // recibe cantidad de terminos
 			MPI_Recv(titulo, 100, MPI_CHAR, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // recibe titulos
